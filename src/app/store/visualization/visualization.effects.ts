@@ -7,7 +7,8 @@ import * as dashboard from '../dashboard/dashboard.actions';
 import { AppState } from '../app.reducers';
 import { Store } from '@ngrx/store';
 import { Observable, of, forkJoin } from 'rxjs';
-import { withLatestFrom ,
+import {
+  withLatestFrom,
   map,
   tap,
   switchMap,
@@ -21,11 +22,11 @@ import * as visualizationHelpers from './helpers/index';
 
 @Injectable()
 export class VisualizationEffects {
-  @Effect({dispatch: false})
+  @Effect({ dispatch: false })
   setInitialVisualizations$ = this.actions$.pipe(
-    ofType<dashboard.SetCurrentAction>(dashboard.DashboardActions.SET_CURRENT)
-    , withLatestFrom(this.store)
-    , tap(([action, state]: [any, AppState]) => {
+    ofType<dashboard.SetCurrentAction>(dashboard.DashboardActions.SET_CURRENT),
+    withLatestFrom(this.store),
+    tap(([action, state]: [any, AppState]) => {
       const visualizationObjects: Visualization[] =
         state.visualization.visualizationObjects;
       const currentDashboard: Dashboard = _.find(state.dashboard.dashboards, [
@@ -33,16 +34,18 @@ export class VisualizationEffects {
         action.payload
       ]);
       if (currentDashboard) {
-        const initialVisualizations: Visualization[] = currentDashboard.dashboardItems.map(
-          (dashboardItem: any) =>
-            !_.find(visualizationObjects, ['id', dashboardItem.id])
-              ? visualizationHelpers.mapDashboardItemToVisualization(
-              dashboardItem,
-              currentDashboard.id,
-              state.currentUser
-              )
-              : null
-        ).filter((visualizationObject: Visualization) => visualizationObject);
+        const initialVisualizations: Visualization[] = currentDashboard.dashboardItems
+          .map(
+            (dashboardItem: any) =>
+              !_.find(visualizationObjects, ['id', dashboardItem.id])
+                ? visualizationHelpers.mapDashboardItemToVisualization(
+                    dashboardItem,
+                    currentDashboard.id,
+                    state.currentUser
+                  )
+                : null
+          )
+          .filter((visualizationObject: Visualization) => visualizationObject);
 
         /**
          * Update store with initial visualization objects
@@ -60,7 +63,8 @@ export class VisualizationEffects {
           );
         });
       }
-    }));
+    })
+  );
 
   @Effect()
   laodFavorite$ = this.actions$.pipe(
@@ -72,23 +76,20 @@ export class VisualizationEffects {
         action.payload.details.favorite
       );
 
-      // const favoritePromise =
-      //   favoriteUrl !== ''
-      //     ? this.httpClient.get(favoriteUrl)
-      //     : of({});
-
       const favoritePromise =
         favoriteUrl !== ''
           ? forkJoin(
-          this.httpClient.get(favoriteUrl),
-          this.httpClient
-            .get('dataStore/favorites/' + action.payload.favorite.id)
-            .pipe(catchError(() => of({})))
-          ).pipe(
-          map((favoriteArray: any[]) => {
-            return { ...favoriteArray[0], ...favoriteArray[1] };
-          })
-          )
+              this.httpClient.get(favoriteUrl),
+              this.httpClient
+                .get(
+                  'dataStore/favorites/' + action.payload.details.favorite.id
+                )
+                .pipe(catchError(() => of({})))
+            ).pipe(
+              map((favoriteArray: any[]) => {
+                return { ...favoriteArray[0], ...favoriteArray[1] };
+              })
+            )
           : of({});
 
       return favoritePromise.pipe(
@@ -119,8 +120,8 @@ export class VisualizationEffects {
       visualization.VisualizationActions.LOAD_ANALYTICS
     ),
     flatMap((action: any) => {
-      const visualizationObject: Visualization = {...action.payload};
-      const visualizationDetails: any = {...visualizationObject.details};
+      const visualizationObject: Visualization = { ...action.payload };
+      const visualizationDetails: any = { ...visualizationObject.details };
       const visualizationLayers: any[] = [...visualizationObject.layers];
       const analyticsPromises = _.map(
         visualizationLayers,
@@ -148,13 +149,13 @@ export class VisualizationEffects {
             filter => {
               return filter.name === 'dx'
                 ? {
-                  ...filter,
-                  items: normalDxItems,
-                  value: _.map(
-                    normalDxItems,
-                    item => item.dimensionItem
-                  ).join(';')
-                }
+                    ...filter,
+                    items: normalDxItems,
+                    value: _.map(
+                      normalDxItems,
+                      item => item.dimensionItem
+                    ).join(';')
+                  }
                 : filter;
             }
           );
@@ -170,19 +171,17 @@ export class VisualizationEffects {
           const newFiltersWithFunction =
             functionItems.length > 0
               ? _.map(
-              visualizationFilter ? visualizationFilter.filters : [],
-              filter => {
-                return filter.name === 'dx'
-                  ? {
-                    ...filter,
-                    items: functionItems,
-                    value: _.map(functionItems, item => item.id).join(
-                      ';'
-                    )
+                  visualizationFilter ? visualizationFilter.filters : [],
+                  filter => {
+                    return filter.name === 'dx'
+                      ? {
+                          ...filter,
+                          items: functionItems,
+                          value: _.map(functionItems, item => item.id).join(';')
+                        }
+                      : filter;
                   }
-                  : filter;
-              }
-              )
+                )
               : [];
 
           /**
@@ -203,8 +202,8 @@ export class VisualizationEffects {
               );
               return sanitizedAnalyticsArray.length > 1
                 ? visualizationHelpers.getMergedAnalytics(
-                  sanitizedAnalyticsArray
-                )
+                    sanitizedAnalyticsArray
+                  )
                 : sanitizedAnalyticsArray[0];
             })
           );
@@ -216,13 +215,13 @@ export class VisualizationEffects {
           const layers = _.map(
             action.payload.layers,
             (visualizationLayer: any, layerIndex: number) => {
-              const visualizationFilter = _.find(
-                visualizationDetails.filters,
-                ['id', visualizationLayer.settings.id]
-              );
+              const visualizationFilter = _.find(visualizationDetails.filters, [
+                'id',
+                visualizationLayer.settings.id
+              ]);
 
               const analytics = visualizationHelpers.getSanitizedAnalytics(
-                {...analyticsResponse[layerIndex]},
+                { ...analyticsResponse[layerIndex] },
                 visualizationFilter ? visualizationFilter.filters : []
               );
 
@@ -231,9 +230,9 @@ export class VisualizationEffects {
                 analytics:
                   analytics.headers || analytics.count
                     ? visualizationHelpers.standardizeIncomingAnalytics(
-                    analytics,
-                    true
-                    )
+                        analytics,
+                        true
+                      )
                     : null
               };
             }
@@ -272,105 +271,127 @@ export class VisualizationEffects {
     ofType<visualization.UpdateVisualizationWithMapSettingsAction>(
       visualization.VisualizationActions.UPDATE_VISUALIZATION_WITH_MAP_SETTINGS
     ),
-    mergeMap(action => this._updateVisualizationWithMapSettings(action.payload).pipe(map(
-      (visualizationObject: Visualization) =>
-        new visualization.AddOrUpdateAction({
-          visualizationObject: visualizationObject,
-          placementPreference: 'normal'
-        })
-    ))));
-
-  @Effect()
-  localFilterChange$ = this.actions$.ofType<visualization.LocalFilterChangeAction>(
-    visualization.VisualizationActions.LOCAL_FILTER_CHANGE
-  ).pipe(
-    map((action: any) =>
-      visualizationHelpers.updateVisualizationWithCustomFilters(
-        action.payload.visualizationObject,
-        visualizationHelpers.getSanitizedCustomFilterObject(
-          action.payload.filterValue
+    mergeMap(action =>
+      this._updateVisualizationWithMapSettings(action.payload).pipe(
+        map(
+          (visualizationObject: Visualization) =>
+            new visualization.AddOrUpdateAction({
+              visualizationObject: visualizationObject,
+              placementPreference: 'normal'
+            })
         )
       )
-    ),
-    map(
-      (visualizationObject: Visualization) =>
-        new visualization.LoadAnalyticsAction(visualizationObject)
     )
   );
 
-  @Effect({dispatch: false})
-  globalFilterChanges$ = this.actions$.pipe(ofType<visualization.GlobalFilterChangeAction>(
-    visualization.VisualizationActions.GLOBAL_FILTER_CHANGE
-  ), withLatestFrom(this.store), tap(([action, state]: [any, AppState]) => {
-    const visualizationToUpdate: Visualization[] = _.filter(
-      state.visualization.visualizationObjects,
-      visualizationObject =>
-        visualizationObject.dashboardId ===
-        action.payload.currentDashboardId &&
-        !visualizationObject.details.nonVisualizable
+  @Effect()
+  localFilterChange$ = this.actions$
+    .ofType<visualization.LocalFilterChangeAction>(
+      visualization.VisualizationActions.LOCAL_FILTER_CHANGE
+    )
+    .pipe(
+      map((action: any) =>
+        visualizationHelpers.updateVisualizationWithCustomFilters(
+          action.payload.visualizationObject,
+          visualizationHelpers.getSanitizedCustomFilterObject(
+            action.payload.filterValue
+          )
+        )
+      ),
+      map(
+        (visualizationObject: Visualization) =>
+          new visualization.LoadAnalyticsAction(visualizationObject)
+      )
     );
 
-    _.each(visualizationToUpdate, (visualizationObject: Visualization) => {
-      this.store.dispatch(
-        new visualization.LocalFilterChangeAction({
-          visualizationObject: visualizationObject,
-          filterValue: action.payload.filterValue
-        })
+  @Effect({ dispatch: false })
+  globalFilterChanges$ = this.actions$.pipe(
+    ofType<visualization.GlobalFilterChangeAction>(
+      visualization.VisualizationActions.GLOBAL_FILTER_CHANGE
+    ),
+    withLatestFrom(this.store),
+    tap(([action, state]: [any, AppState]) => {
+      const visualizationToUpdate: Visualization[] = _.filter(
+        state.visualization.visualizationObjects,
+        visualizationObject =>
+          visualizationObject.dashboardId ===
+            action.payload.currentDashboardId &&
+          !visualizationObject.details.nonVisualizable
       );
-    });
-  }));
 
-  @Effect({dispatch: false})
-  resizeAction$ = this.actions$.pipe(ofType<visualization.ResizeAction>(
-    visualization.VisualizationActions.RESIZE
-  ), switchMap((action: any) =>
-    this._resize(action.payload.visualizationId, action.payload.shape).
-      pipe(map(() => new visualization.ResizeSuccessAction()))
-  ));
+      _.each(visualizationToUpdate, (visualizationObject: Visualization) => {
+        this.store.dispatch(
+          new visualization.LocalFilterChangeAction({
+            visualizationObject: visualizationObject,
+            filterValue: action.payload.filterValue
+          })
+        );
+      });
+    })
+  );
 
-  @Effect()
-  deleteActions$ = this.actions$.ofType<visualization.DeleteAction>(
-    visualization.VisualizationActions.DELETE
-  ).pipe(
-    map((action: visualization.DeleteAction) => action.payload),
-    switchMap(({dashboardId, visualizationId}) =>
-      this._delete(dashboardId, visualizationId).pipe(
-        map(
-          () =>
-            new visualization.DeleteSuccessAction({
-              dashboardId,
-              visualizationId
-            })
-        ),
-        catchError(() =>
-          of(new visualization.DeleteFailAction(visualizationId))
-        )
+  @Effect({ dispatch: false })
+  resizeAction$ = this.actions$.pipe(
+    ofType<visualization.ResizeAction>(
+      visualization.VisualizationActions.RESIZE
+    ),
+    switchMap((action: any) =>
+      this._resize(action.payload.visualizationId, action.payload.shape).pipe(
+        map(() => new visualization.ResizeSuccessAction())
       )
     )
   );
 
   @Effect()
-  deleteSuccess$ = this.actions$.ofType<visualization.DeleteSuccessAction>(
-    visualization.VisualizationActions.DELETE_SUCCESS
-  ).pipe(
-    map((action: visualization.DeleteSuccessAction) => action.payload),
-    map(
-      ({dashboardId, visualizationId}) =>
-        new dashboard.DeleteItemSuccessAction({
-          dashboardId,
-          visualizationId
-        })
+  deleteActions$ = this.actions$
+    .ofType<visualization.DeleteAction>(
+      visualization.VisualizationActions.DELETE
     )
-  );
+    .pipe(
+      map((action: visualization.DeleteAction) => action.payload),
+      switchMap(({ dashboardId, visualizationId }) =>
+        this._delete(dashboardId, visualizationId).pipe(
+          map(
+            () =>
+              new visualization.DeleteSuccessAction({
+                dashboardId,
+                visualizationId
+              })
+          ),
+          catchError(() =>
+            of(new visualization.DeleteFailAction(visualizationId))
+          )
+        )
+      )
+    );
 
-  constructor(private actions$: Actions,
+  @Effect()
+  deleteSuccess$ = this.actions$
+    .ofType<visualization.DeleteSuccessAction>(
+      visualization.VisualizationActions.DELETE_SUCCESS
+    )
+    .pipe(
+      map((action: visualization.DeleteSuccessAction) => action.payload),
+      map(
+        ({ dashboardId, visualizationId }) =>
+          new dashboard.DeleteItemSuccessAction({
+            dashboardId,
+            visualizationId
+          })
+      )
+    );
+
+  constructor(
+    private actions$: Actions,
     private store: Store<AppState>,
-    private httpClient: HttpClientService) {
-  }
+    private httpClient: HttpClientService
+  ) {}
 
-  private getNormalAnalyticsPromise(visualizationType: string,
+  private getNormalAnalyticsPromise(
+    visualizationType: string,
     visualizationSettings: any,
-    visualizationFilters: any[]): Observable<any> {
+    visualizationFilters: any[]
+  ): Observable<any> {
     const analyticsUrl = visualizationHelpers.constructAnalyticsUrl(
       visualizationType,
       visualizationSettings,
@@ -379,25 +400,27 @@ export class VisualizationEffects {
 
     return analyticsUrl !== ''
       ? this.httpClient.get(analyticsUrl).pipe(
-        mergeMap((analyticsResult: any) => {
-          return analyticsResult.count && analyticsResult.count < 2000
-            ? this.httpClient.get(
-              visualizationHelpers.constructAnalyticsUrl(
-                visualizationType,
-                {
-                  ...visualizationSettings,
-                  eventClustering: false
-                },
-                visualizationFilters
-              )
-            )
-            : of(analyticsResult);
-        })
-      )
+          mergeMap((analyticsResult: any) => {
+            return analyticsResult.count && analyticsResult.count < 2000
+              ? this.httpClient.get(
+                  visualizationHelpers.constructAnalyticsUrl(
+                    visualizationType,
+                    {
+                      ...visualizationSettings,
+                      eventClustering: false
+                    },
+                    visualizationFilters
+                  )
+                )
+              : of(analyticsResult);
+          })
+        )
       : of(null);
   }
 
-  private getFunctionAnalyticsPromise(visualizationFilters: any[]): Observable<any> {
+  private getFunctionAnalyticsPromise(
+    visualizationFilters: any[]
+  ): Observable<any> {
     return new Observable(observer => {
       if (
         visualizationFilters.length === 0 ||
@@ -422,10 +445,8 @@ export class VisualizationEffects {
                 pe: peValue,
                 ou: ouValue,
                 rule: dxItem.config ? dxItem.config.ruleDefinition : null,
-                success: result => {
-                },
-                error: error => {
-                }
+                success: result => {},
+                error: error => {}
               },
               dxItem.config ? dxItem.config.functionString : ''
             );
@@ -446,8 +467,10 @@ export class VisualizationEffects {
     });
   }
 
-  private _runFunction(functionParameters: any,
-    functionString: string): Observable<any> {
+  private _runFunction(
+    functionParameters: any,
+    functionString: string
+  ): Observable<any> {
     return new Observable(observ => {
       if (!this._isError(functionString)) {
         try {
@@ -459,8 +482,7 @@ export class VisualizationEffects {
             observ.next(results);
             observ.complete();
           };
-          functionParameters.progress = results => {
-          };
+          functionParameters.progress = results => {};
           const execute = Function('parameters', functionString);
 
           execute(functionParameters);
@@ -469,7 +491,7 @@ export class VisualizationEffects {
           observ.complete();
         }
       } else {
-        observ.error({message: 'Errors in the code.'});
+        observ.error({ message: 'Errors in the code.' });
         observ.complete();
       }
     });
@@ -479,7 +501,13 @@ export class VisualizationEffects {
     let successError = false;
     let errorError = false;
     let progressError = false;
-    const value = code.split(' ').join('').split('\n').join('').split('\t').join('');
+    const value = code
+      .split(' ')
+      .join('')
+      .split('\n')
+      .join('')
+      .split('\t')
+      .join('');
     if (value.indexOf('parameters.success(') === -1) {
       successError = true;
     }
@@ -494,15 +522,18 @@ export class VisualizationEffects {
 
   private _delete(dashboardId: string, visualizationId: string) {
     return this.httpClient.delete(
-      'dashboards/' + dashboardId + '/items/' + visualizationId, true
+      'dashboards/' + dashboardId + '/items/' + visualizationId,
+      true
     );
   }
 
-  private _updateVisualizationWithMapSettings(visualizationObject: Visualization) {
+  private _updateVisualizationWithMapSettings(
+    visualizationObject: Visualization
+  ) {
     const newVisualizationObject: Visualization =
       visualizationObject.details.type !== 'MAP'
         ? visualizationHelpers.getSplitedVisualization(visualizationObject)
-        : {...visualizationObject};
+        : { ...visualizationObject };
 
     const newVisualizationObjectDetails: any = {
       ...newVisualizationObject.details
@@ -533,10 +564,10 @@ export class VisualizationEffects {
            * Get geo feature
            * @type {string}
            */
-            // TODO find best way to reduce number of geoFeature calls
+          // TODO find best way to reduce number of geoFeature calls
           const geoFeatureUrl = visualizationHelpers.getGeoFeatureUrl(
             orgUnitFilterValue
-            );
+          );
           return geoFeatureUrl !== ''
             ? this.httpClient.get(geoFeatureUrl)
             : of(null);
@@ -547,11 +578,11 @@ export class VisualizationEffects {
         (geoFeatureResponse: any[]) => {
           newVisualizationObject.layers = newVisualizationObject.layers.map(
             (layer: any, layerIndex: number) => {
-              const newSettings: any = {...layer.settings};
+              const newSettings: any = { ...layer.settings };
               if (geoFeatureResponse[layerIndex] !== null) {
                 newSettings.geoFeature = [...geoFeatureResponse[layerIndex]];
               }
-              return {...layer, settings: newSettings};
+              return { ...layer, settings: newSettings };
             }
           );
           newVisualizationObjectDetails.loaded = true;
