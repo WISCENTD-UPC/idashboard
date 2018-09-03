@@ -7,7 +7,7 @@ import * as dashboard from '../dashboard/dashboard.actions';
 import { AppState } from '../app.reducers';
 import { Store } from '@ngrx/store';
 import { Observable, of, forkJoin } from 'rxjs';
-import { withLatestFrom , 
+import { withLatestFrom ,
   map,
   tap,
   switchMap,
@@ -72,9 +72,23 @@ export class VisualizationEffects {
         action.payload.details.favorite
       );
 
+      // const favoritePromise =
+      //   favoriteUrl !== ''
+      //     ? this.httpClient.get(favoriteUrl)
+      //     : of({});
+
       const favoritePromise =
         favoriteUrl !== ''
-          ? this.httpClient.get(favoriteUrl)
+          ? forkJoin(
+          this.httpClient.get(favoriteUrl),
+          this.httpClient
+            .get('dataStore/favorites/' + action.payload.favorite.id)
+            .pipe(catchError(() => of({})))
+          ).pipe(
+          map((favoriteArray: any[]) => {
+            return { ...favoriteArray[0], ...favoriteArray[1] };
+          })
+          )
           : of({});
 
       return favoritePromise.pipe(
