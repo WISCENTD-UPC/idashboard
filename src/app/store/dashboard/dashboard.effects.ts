@@ -311,7 +311,7 @@ export class DashboardEffects {
   private _loadAll(): Observable<Dashboard[]> {
     return new Observable(observer => {
       this.httpClient.get(
-        `dataStore/nacpDashboard/dashboards`
+        `dataStore/nacpDashboard/dashboards.json?fields=*,interpretations[*],dataElementDimensions[dataElement[id,name,optionSet[id,options[id,name,code]]]],displayDescription,program[id,name],programStage[id,name],legendSet[*,legends[*]],interpretations[*,user[id,displayName],likedBy[id,displayName],comments[lastUpdated,text,user[id,displayName]]],columns[dimension,filter,legendSet,items[id,dimensionItem,dimensionItemType,displayName]],rows[dimension,filter,legendSet,items[id,dimensionItem,dimensionItemType,displayName]],filters[dimension,filter,legendSet,items[id,dimensionItem,dimensionItemType,displayName]],access,userGroupAccesses,publicAccess,displayDescription,user[displayName,dataViewOrganisationUnits],!href,!rewindRelativePeriods,!userOrganisationUnit,!userOrganisationUnitChildren,!userOrganisationUnitGrandChildren,!externalAccess,!relativePeriods,!columnDimensions,!rowDimensions,!filterDimensions,!organisationUnitGroups,!itemOrganisationUnitGroups,!indicators,!dataElements,!dataElementOperands,!dataElementGroups,!dataSets,!periods,!organisationUnitLevels,!organisationUnits`
       ).subscribe(
         (dashboardResponse: any) => {
           observer.next(dashboardResponse.dashboards || []);

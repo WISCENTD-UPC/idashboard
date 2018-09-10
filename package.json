@@ -5,7 +5,7 @@
   "scripts": {
     "ng": "ng",
     "setup": "npm install && sh scripts/update-submodules.sh",
-    "start": "ng serve --aot --port 4201 --proxy proxy-config.json --watch",
+    "start": "ng serve --aot --port 4201 --open --proxy proxy-config.json --watch",
     "build": "ng build --prod --aot --output-hashing all --sourcemaps false --named-chunks false --build-optimizer --vendor-chunk  && cd dist && zip -r -D idashboard-21.zip .",
     "test": "ng test",
     "lint": "ng lint",
