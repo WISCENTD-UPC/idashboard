@@ -33,16 +33,16 @@ export class HomeComponent implements OnInit {
     this.dashboardsCreating$ = store.select(getDashboardCreateStatus);
     this.welcomingMessageObject = {
       0: {
-        title: 'Welcome To NACP Dashboard',
-        description: 'Welcome To NACP Dashboard'
+        title: 'NACP Dashboard',
+        description: ''
       },
       1: {
-        title: 'Welcome To NACP Dashboard',
-        description: 'Welcome To NACP Dashboard'
+        title: 'NACP Dashboard',
+        description: ''
       },
       2: {
-        title: 'Welcome To NACP Dashboard',
-        description: 'Welcome To NACP Dashboard'
+        title: 'NACP Dashboard',
+        description: ''
       },
 
     };
