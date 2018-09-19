@@ -6,5 +6,7 @@ export function getVisualizationWidthFromShape(dashboardItemShape: string): stri
       return 'span 3';
     default:
       return 'auto';
+    case 'CAINAM_DOUBLE_WIDTH':
+      return 'span 4';
   }
 }

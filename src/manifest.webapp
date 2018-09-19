@@ -4,9 +4,9 @@
     "description": "NACP Dashboard",
     "launch_path": "index.html",
     "icons": {
-        "16": "assets/img/hiv.jpg",
-        "48": "assets/img/hiv.jpg",
-        "128": "assets/img/hiv.jpg"
+        "16": "assets/img/welcome.png",
+        "48": "assets/img/welcome.png",
+        "128": "assets/img/welcome.png"
     },
     "developer": {
         "name": "HISPTZ",
