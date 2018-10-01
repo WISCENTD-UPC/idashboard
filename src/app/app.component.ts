@@ -19,7 +19,7 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.setTitle('Interactive Dashboard 2');
+    this.setTitle('NACP Dashboard');
   }
 
   public setTitle( newTitle: string) {
