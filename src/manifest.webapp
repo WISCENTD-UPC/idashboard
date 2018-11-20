@@ -15,9 +15,9 @@
     "default_locale": "en",
     "activities": {
         "dhis": {
-            "username": "webuser",
-             "password": "We!1425Bakshsfa",
-            "href": ""
+            "username": "ntdwebportaluser",
+			"password": "Test@1234",
+            "href": "https://extranet-uat.who.int/dhis2/"
         }
     }
 }
