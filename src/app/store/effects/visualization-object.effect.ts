@@ -24,7 +24,7 @@ export class VisualizationObjectEffect {
 
         if (visualizationDetails && visualizationDetails.favorite && visualizationDetails.favorite.id) {
           this.store.dispatch(new fromAction.LoadFavoriteAction({
-            apiRootUrl: store.uiState.systemInfo.rootUrl + '/api/',
+            apiRootUrl: store.uiState.systemInfo.rootUrl + 'api/',
             visualizationObject: visualizationObject
           }))
         }
