@@ -19,9 +19,9 @@ export const INITIAL_UI_STATE = {
   systemInfo: {
     rootUrl: undefined,
     apiRootUrl: undefined,
-    currentVersion: 2.25,
-    maxSupportedVersion: 2.25,
-    minSupportedVersion: 2.18,
+    currentVersion: 2.30,
+    maxSupportedVersion: 2.30,
+    minSupportedVersion: 2.26,
     loaded: false
   },
   currentDashboard: undefined,

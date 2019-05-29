@@ -22,7 +22,7 @@ export class SystemInfoService {
           .subscribe((systemInfo: any) => {
             observer.next({
               rootUrl: rootUrl,
-              apiRootUrl: this._getApiRootUrl(rootUrl  + 'api/', systemInfo.version, '2.25'),
+              apiRootUrl: this._getApiRootUrl(rootUrl  + 'api/', systemInfo.version, '2.30'),
               currentVersion: systemInfo.version
             });
             observer.complete();
