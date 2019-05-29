@@ -20,7 +20,7 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.setTitle('Interactive Dashboard 2');
+    this.setTitle('NTD WebPortal');
   }
 
   public setTitle( newTitle: string) {
